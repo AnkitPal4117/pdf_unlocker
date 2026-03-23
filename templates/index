@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free PDF Unlocker | freepdfunlockeronline.com</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Optional: adjust eye button position */
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 10;
+        }
+        .password-toggle:hover {
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Simple header with site name (no navigation) -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-center items-center">
+                <i class="fas fa-file-pdf text-red-600 text-2xl mr-2"></i>
+                <span class="text-xl font-bold text-gray-800">Free<span class="text-red-600">PDFUnlocker</span>Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto py-8 px-4">
+        <div class="max-w-2xl mx-auto">
+            <!-- Tool Card -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-red-600 px-6 py-4">
+                    <h1 class="text-2xl font-bold text-white flex items-center justify-center">
+                        <i class="fas fa-unlock-alt mr-2"></i> Unlock Your PDF
+                    </h1>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-600 text-center mb-6">Upload a password‑protected PDF and get an unlocked version instantly. Files are automatically deleted after processing – privacy first.</p>
+                    
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <!-- File input -->
+                        <div class="mb-5">
+                            <label class="block text-gray-700 font-medium mb-2">Select PDF file</label>
+                            <div class="relative">
+                                <i class="fas fa-file-pdf absolute left-3 top-3 text-gray-400"></i>
+                                <input type="file" name="pdf" accept=".pdf" required
+                                       class="w-full border border-gray-300 rounded-lg py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <!-- Password input with show/hide toggle -->
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">Password</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                                <input type="password" id="password" name="password" required
+                                       class="w-full border border-gray-300 rounded-lg py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <i class="fas fa-eye-slash password-toggle" id="togglePassword"></i>
+                            </div>
+                        </div>
+                        <!-- Submit button -->
+                        <button type="submit"
+                                class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition duration-200 flex items-center justify-center space-x-2">
+                            <i class="fas fa-key"></i>
+                            <span>Unlock PDF</span>
+                        </button>
+                    </form>
+
+                    <!-- Loading spinner -->
+                    <div id="spinner" class="hidden text-center mt-6">
+                        <i class="fas fa-spinner fa-spin text-red-600 text-3xl"></i>
+                        <p class="text-gray-600 text-sm mt-2">Unlocking PDF, please wait...</p>
+                    </div>
+
+                    <!-- Message area (errors or success) -->
+                    <div id="message" class="mt-6 text-center text-sm hidden"></div>
+                </div>
+            </div>
+
+            <!-- Privacy note and links -->
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p><i class="fas fa-trash-alt mr-1"></i> Files are deleted 30 seconds after processing.</p>
+                                
+                    
+            </div>
+        </div>
+    </main>
+
+    <!-- Simple footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="container mx-auto px-4 py-6 text-center text-gray-400 text-sm">
+            &copy; 2025 freepdfunlockeronline.com. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Password visibility toggle
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePassword');
+        
+        toggleIcon.addEventListener('click', function() {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Toggle the icon class
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Form submission logic (same as before)
+        const form = document.getElementById('uploadForm');
+        const messageDiv = document.getElementById('message');
+        const spinner = document.getElementById('spinner');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            messageDiv.classList.add('hidden');
+            spinner.classList.remove('hidden');
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/unlock', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                spinner.classList.add('hidden');
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'unlocked.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    messageDiv.textContent = '✅ File unlocked successfully! Download started.';
+                    messageDiv.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+                    messageDiv.classList.add('bg-green-100', 'text-green-700', 'p-3', 'rounded-lg');
+                } else {
+                    let errorMsg = 'Something went wrong.';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error || errorMsg;
+                    } catch (e) { /* ignore */ }
+                    messageDiv.textContent = '❌ ' + errorMsg;
+                    messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                    messageDiv.classList.add('bg-red-100', 'text-red-700', 'p-3', 'rounded-lg');
+                }
+            } catch (err) {
+                spinner.classList.add('hidden');
+                messageDiv.textContent = '❌ Network error. Please try again.';
+                messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                messageDiv.classList.add('bg-red-100', 'text-red-700', 'p-3', 'rounded-lg');
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
