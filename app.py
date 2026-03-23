@@ -27,7 +27,7 @@ def too_large(e):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index')
 
 @app.route('/unlock', methods=['POST'])
 def unlock_pdf():
